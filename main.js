@@ -67,7 +67,7 @@ class Field {
         }
     }
 
-    static generateField(width, height, hat, hole, fieldChar, pathChar) {
+    static generateField(width = 10, height = 10, hat, hole, fieldChar, pathChar) {
         let newField = [];
         let holeCount = Math.round(width*height*0.3);
         let hatX = Math.ceil(Math.random()*(width-1));
@@ -108,7 +108,11 @@ class Field {
     ['░', '░', '░'],
 ]);*/
 
-const newField = Field.generateField(10, 10, hat, hole, fieldCharacter, pathCharacter);
+let width = process.argv[2];
+
+let height = process.argv[3];
+
+const newField = Field.generateField(width, height, hat, hole, fieldCharacter, pathCharacter);
 
 const myField = new Field(newField);
 
