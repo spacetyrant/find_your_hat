@@ -47,6 +47,7 @@ class Field {
     print() {
         for(let row of this.field) {
             let newString = '';
+            
             for (let element of row) {
                 newString += element;
             }
@@ -67,7 +68,27 @@ class Field {
         }
     }
 
-    static generateField(width = 10, height = 10, hat, hole, fieldChar, pathChar) {
+    createRandomStart(hat, pathChar) {
+        let hatLocation = this.findHatXY(hat);
+        this.characterX = hatLocation[0];
+        this.characterY = hatLocation[1];
+
+        while (this.characterX === hatLocation[0] && this.characterY === hatLocation[1]) {
+            this.characterY = Math.floor(Math.random()*(this.field.length));
+            this.characterX = Math.floor(Math.random()*(this.field[this.characterY].length));
+        }
+        this.field = pathChar;
+    }
+
+    createStart(hat, pathChar, randomStartFlag) {
+        if (randomStartFlag === 'r') {
+            this.createRandomStart(hat, pathChar);
+        } else {
+            this.field = pathChar;
+        }
+    }
+
+    static generateField(width = 10, height = 10, hat, hole, fieldChar) {
         let newField = [];
         let holeCount = Math.round(width*height*0.3);
         let hatX = Math.ceil(Math.random()*(width-1));
@@ -91,33 +112,22 @@ class Field {
             newField.push(child);
         }
 
-        // Starting point
-        newField[0][0] = pathChar;
         // Hat location
         newField[hatY][hatX] = hat;
-
         return newField;
     }
 }
 
-// Test field
-
-/*const myField = new Field([
-    ['*', '░', 'O'],
-    ['░', 'O', '^'],
-    ['░', '░', '░'],
-]);*/
+// Initialize field elements
 
 let width = process.argv[2];
-
 let height = process.argv[3];
-
-const newField = Field.generateField(width, height, hat, hole, fieldCharacter, pathCharacter);
-
-const myField = new Field(newField);
-
+let randomStartFlag = process.argv[4];
 let gameEnd = false;
 
+// If left blank when main.js is called, width and height both default to 10
+const newField = Field.generateField(width, height, hat, hole, fieldCharacter, pathCharacter);
+const myField = new Field(newField);
 const myHat = myField.findHatXY(hat);
 
 const checkForLoss = () => {
@@ -132,8 +142,10 @@ const checkForWin = () => {
     }
 };
 
-// Game loop
+// Initialize starting position (setting randomStartFlag to 'r' will randomize starting position; default is [0,0]
+myField.createStart(hat, pathCharacter, randomStartFlag);
 
+// Game loop
 while (!gameEnd) {
     myField.print();
 
